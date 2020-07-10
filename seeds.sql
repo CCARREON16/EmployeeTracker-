@@ -7,9 +7,9 @@ VALUES ("Sales lead", "100000" , 1), ("Salesperson", "80000" , 1), ("Lead Engine
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
 VALUES ( "John", "Doe", 5, 12),
 		( "Mike", "Chan", 6, 13),
-        ( "Ashley", "Rodriguez", 7, null),
+        ( "Ashley", "Rodriguez", 7, 7),
         ( "Kevin", "Tupik", 8, 12),
-        ( "Malia", "Brown", 9, null),
-        ( "Sarah", "Lourd", 10, null),
+        ( "Malia", "Brown", 9, 9),
+        ( "Sarah", "Lourd", 10, 10),
           ( "Tom", "Allen", 11, 14);
         

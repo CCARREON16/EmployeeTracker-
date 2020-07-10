@@ -1,6 +1,6 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
-const consoleTable = require("console.table")
+//const consoleTable = require("console.table")
 
 
 
@@ -16,7 +16,7 @@ const connection = mysql.createConnection({
     user: "root",
   
     // Your password
-    password: "miley6545",
+    password: "rootqwer",
     database: "employees_db"
   });
 
@@ -63,10 +63,10 @@ const connection = mysql.createConnection({
             addRole();
             break;
         case "EXIT": 
-            endApp();
+            endPrompt();
             break;
         default:
-            break;
+
     }
 })
 }
@@ -96,4 +96,140 @@ function viewRoles() {
     console.table('All roles:', res);
     beginPrompt();
     })
+}
+
+function addEmployee() {
+    connection.query("SELECT * FROM role", function (err, res) {
+    if (err) throw err;
+    
+    inquirer
+        .prompt([
+            {
+                name: "first_name",
+                type: "input", 
+                message: "Employee Fist Name: ",
+            },
+            {
+                name: "last_name",
+                type: "input", 
+                message: "Employee Last Name: "
+            },
+            {
+                name: "duty", 
+                type: "list",
+                choices: function() {
+                var roleArray = [];
+                for (let i = 0; i < res.length; i++) {
+                    roleArray.push(res[i].title);
+                }
+                return roleArray;
+                },
+
+                message: "Employee Role?: "
+            }
+            ]).then(function (answer) {
+                let roleID;
+                for (let j = 0; j < res.length; j++) {
+                if (res[j].title == answer.role) {
+                    roleID = res[j].id;
+                    console.log(roleID)
+                }                  
+                }  
+                connection.query(
+                "INSERT INTO employees SET ?",
+                {
+
+                    first_name: answer.first_name,
+                    last_name: answer.last_name,
+                    role_id: roleID,
+                },
+                function (err) {
+                    if (err) throw err;
+                    console.log("Employee Added");
+                    beginPrompt();
+                }
+                )
+            })
+    })
+}
+
+function addDepartment() {
+    inquirer
+    .prompt([
+        {
+            name: "new_dept", 
+            type: "input", 
+            message: "What is the new department you would like to add?"
+        }
+    ]).then(function (answer) {
+        connection.query(
+            "INSERT INTO department SET ?",
+            {
+                name: answer.new_dept
+            }
+        );
+          var query = "SELECT * FROM department";
+        connection.query(query, function(err, res) {
+        if(err)throw err;
+        console.table('All Departments:', res);
+        beginPrompt();
+        })
+    })
+}
+
+function addRole() {
+    connection.query("SELECT * FROM department", function(err, res) {
+    if (err) throw err;
+
+    inquirer 
+    .prompt([
+        {
+            name: "new_role",
+            type: "input", 
+            message: "What is the Title of the new role?"
+        },
+        {
+            name: "salary",
+            type: "input",
+            message: "What is the salary of this position? (Enter a number?)"
+        },
+        {
+            name: "deptChoice",
+            type: "rawlist",
+            choices: function() {
+                var deptArry = [];
+                for (let i = 0; i < res.length; i++) {
+                deptArry.push(res[i].name);
+                }
+                return deptArry;
+            },
+        }
+    ]).then(function (answer) {
+        let deptID;
+        for (let j = 0; j < res.length; j++) {
+            if (res[j].name == answer.deptChoice) {
+                deptID = res[j].id;
+            }
+        }
+
+        connection.query(
+            "INSERT INTO role SET ?",
+            {
+                title: answer.new_role,
+                salary: answer.salary,
+                department_id: deptID
+            },
+            function (err, res) {
+                if(err)throw err;
+                console.log("Role Added");
+                beginPrompt();
+            }
+        )
+    })
+    })
+    
+}
+
+function endPrompt() {
+    connection.end();
 }
