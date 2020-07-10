@@ -34,7 +34,7 @@ const connection = mysql.createConnection({
         choices: [
             "View all employees",
                 "View all departments",
-                "View all roles",
+                "View all duties",
                 "Add an employee",
                 "Add department",
                 "Add a role",
@@ -50,8 +50,8 @@ const connection = mysql.createConnection({
         case "View all departments":
             viewDepartments();
             break;
-        case "View all roles":
-            viewRoles();
+        case "View all duties":
+            viewDuties();
             break;
         case "Add an employee":
             addEmployee();
@@ -59,8 +59,8 @@ const connection = mysql.createConnection({
         case "Add department":
             addDepartment();
             break;
-        case "Add a role":
-            addRole();
+        case "Add a duty":
+            addDuty();
             break;
         case "EXIT": 
             endPrompt();
@@ -71,10 +71,10 @@ const connection = mysql.createConnection({
 })
 }
 function viewEmployees() {
-    var query = "SELECT * FROM employees";
+    var query = "SELECT * FROM employee";
     connection.query(query, function(err, res) {
     if (err) throw err;
-    console.log(res.length + " employees found!");
+    console.log(res.length + " employee found!");
     console.table('All Employees:', res); 
     beginPrompt();
     })
@@ -89,17 +89,17 @@ function viewDepartments() {
     })
 }
 
-function viewRoles() {
-    var query = "SELECT * FROM role";
+function viewDuties() {
+    var query = "SELECT * FROM duty";
     connection.query(query, function(err, res){
     if (err) throw err;
-    console.table('All roles:', res);
+    console.table('All duties:', res);
     beginPrompt();
     })
 }
 
 function addEmployee() {
-    connection.query("SELECT * FROM role", function (err, res) {
+    connection.query("SELECT * FROM duty", function (err, res) {
     if (err) throw err;
     
     inquirer
@@ -107,7 +107,7 @@ function addEmployee() {
             {
                 name: "first_name",
                 type: "input", 
-                message: "Employee Fist Name: ",
+                message: "Employee First Name: ",
             },
             {
                 name: "last_name",
@@ -125,7 +125,7 @@ function addEmployee() {
                 return roleArray;
                 },
 
-                message: "Employee Role?: "
+                message: "Employee Duty?: "
             }
             ]).then(function (answer) {
                 let roleID;
@@ -136,7 +136,7 @@ function addEmployee() {
                 }                  
                 }  
                 connection.query(
-                "INSERT INTO employees SET ?",
+                "INSERT INTO employee SET ?",
                 {
 
                     first_name: answer.first_name,
@@ -177,21 +177,21 @@ function addDepartment() {
     })
 }
 
-function addRole() {
+function addDuty() {
     connection.query("SELECT * FROM department", function(err, res) {
     if (err) throw err;
 
     inquirer 
     .prompt([
         {
-            name: "new_role",
+            name: "new_duty",
             type: "input", 
-            message: "What is the Title of the new role?"
+            message: "What is the new duty of the employee?"
         },
         {
             name: "salary",
             type: "input",
-            message: "What is the salary of this position? (Enter a number?)"
+            message: "How much does this position pay?"
         },
         {
             name: "deptChoice",
@@ -213,15 +213,15 @@ function addRole() {
         }
 
         connection.query(
-            "INSERT INTO role SET ?",
+            "INSERT INTO duty SET ?",
             {
-                title: answer.new_role,
+                title: answer.new_duty,
                 salary: answer.salary,
                 department_id: deptID
             },
             function (err, res) {
                 if(err)throw err;
-                console.log("Role Added");
+                console.log("Duty Added");
                 beginPrompt();
             }
         )
