@@ -37,7 +37,7 @@ const connection = mysql.createConnection({
                 "View all duties",
                 "Add an employee",
                 "Add department",
-                "Add a role",
+                "Add a duty",
                 "EXIT"
         ]
     })
@@ -75,31 +75,34 @@ function viewEmployees() {
     connection.query(query, function(err, res) {
     if (err) throw err;
     console.log(res.length + " employee found!");
-    console.table('All Employees:', res); 
-    beginPrompt();
+    console.table( res); 
+   
     })
+    beginPrompt();
 }
 
 function viewDepartments() {
     var query = "SELECT * FROM department";
     connection.query(query, function(err, res) {
     if(err)throw err;
-    console.table('All Departments:', res);
-    beginPrompt();
+    console.table( res);
+   
     })
+    beginPrompt();
 }
 
 function viewDuties() {
     var query = "SELECT * FROM duty";
     connection.query(query, function(err, res){
     if (err) throw err;
-    console.table('All duties:', res);
-    beginPrompt();
+    console.table( res);
+    
     })
+    beginPrompt();
 }
 
 function addEmployee() {
-    connection.query("SELECT * FROM duty", function (err, res) {
+    connection.query("SELECT * FROM employee", function (err, res) {
     if (err) throw err;
     
     inquirer
@@ -120,28 +123,44 @@ function addEmployee() {
                 choices: function() {
                 var roleArray = [];
                 for (let i = 0; i < res.length; i++) {
-                    roleArray.push(res[i].title);
+                    roleArray.push(res[i].role_id);
                 }
                 return roleArray;
                 },
 
                 message: "Employee Duty?: "
-            }
+            },
+            {
+           name: "manager", 
+                type: "list",
+                choices: function() {
+                var roleArray = [];
+                for (let i = 0; i < res.length; i++) {
+                    roleArray.push(res[i].manager_id);
+                }
+                return roleArray;
+               },
+
+               message: "Employee Duty?: "
+           }
             ]).then(function (answer) {
-                let roleID;
-                for (let j = 0; j < res.length; j++) {
-                if (res[j].title == answer.role) {
-                    roleID = res[j].id;
-                    console.log(roleID)
-                }                  
-                }  
+                // let roleID;
+                // for (let j = 0; j < res.length; j++) {
+                // if (res[j].title == answer.role) {
+                //     roleArray = res[j].id;
+                //     console.log(roleID)
+                // }                  
+                // }  
                 connection.query(
                 "INSERT INTO employee SET ?",
                 {
 
                     first_name: answer.first_name,
                     last_name: answer.last_name,
-                    role_id: roleID,
+                    role_id: answer.duty,
+                    manager_id:answer.manager
+                    
+                    
                 },
                 function (err) {
                     if (err) throw err;
@@ -166,14 +185,19 @@ function addDepartment() {
             "INSERT INTO department SET ?",
             {
                 name: answer.new_dept
+                
             }
+           
         );
           var query = "SELECT * FROM department";
         connection.query(query, function(err, res) {
         if(err)throw err;
-        console.table('All Departments:', res);
-        beginPrompt();
+        console.table( res);
+        
+       
         })
+        beginPrompt();
+       
     })
 }
 
@@ -222,9 +246,9 @@ function addDuty() {
             function (err, res) {
                 if(err)throw err;
                 console.log("Duty Added");
-                beginPrompt();
-            }
-        )
+                
+             } )
+        
     })
     })
     
